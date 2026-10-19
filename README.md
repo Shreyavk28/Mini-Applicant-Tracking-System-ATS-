@@ -1,132 +1,160 @@
 
-# HireFlow ATS — Mini Applicant Tracking System
+# HireFlow ATS — Applicant Tracking System
 
-HireFlow ATS is a web-based Applicant Tracking System (ATS) designed to help recruiters manage candidates, track recruitment progress, search candidate records, and monitor hiring activities through a centralized dashboard.
+HireFlow ATS is a full-stack Applicant Tracking System designed to help recruiters manage candidates, job openings, and applications through a centralized dashboard. It provides candidate and job management, application-stage tracking, search functionality, and real-time dashboard metrics backed by a MySQL database.
 
-This project was developed as a Mini Applicant Tracking System assignment for the Full Stack Developer Intern role at EarlyJobs.ai.
+## 🚀 Live Demo
 
-## Features
+- **Frontend:** https://mini-applicant-tracking-system-ats.vercel.app
+- **Backend API:** https://hireflow-ats-api-fresh.vercel.app
+- **API Health Check:** https://hireflow-ats-api-fresh.vercel.app/api/health
+- **GitHub Repository:** https://github.com/Shreyavk28/Mini-Applicant-Tracking-System-ATS-
+
+## ✨ Features
 
 ### 1. Dashboard
-- View total candidates and applications.
-- Monitor applications across different hiring stages.
-- View recent applications and candidate activity.
-- Get a quick overview of recruitment progress.
+- View total candidates, jobs, and applications.
+- Monitor applications grouped by recruitment stage.
+- Access recruitment information from a centralized dashboard.
 
 ### 2. Candidate Management
-- Add new candidate records.
-- View candidate information.
-- Edit candidate details.
-- Delete candidate records.
-- Organize candidate information in one place.
+- Add new candidates.
+- View candidate records.
+- Edit candidate information.
+- Delete candidates.
+- Search and filter candidate records where supported by the interface.
 
-### 3. Application and Hiring Pipeline
-- Manage applications associated with candidates and jobs.
-- Track application progress through hiring stages.
-- View application status and related information.
-- Monitor hiring-stage counts through the dashboard.
+### 3. Job Management
+- Create job openings.
+- View available jobs.
+- Edit job details.
+- Delete job postings.
 
-### 4. Search
-- Search candidate records.
-- Find relevant information more efficiently.
+### 4. Application Management
+- Manage candidate applications.
+- Track applications through recruitment stages.
+- Update application stages.
+- Keep application records synchronized with the database.
 
-### 5. Job Management
-- View available job openings.
-- Add new jobs.
-- Edit existing job details.
-- Delete job openings.
-- Store job title, department, location, and employment type.
+### 5. Search and Filtering
+- Find relevant candidates and records using the available search functionality.
+- Navigate recruitment data more efficiently.
 
-## Technology Stack
+### 6. Persistent Database
+- Store candidates, jobs, and applications in MySQL.
+- Preserve changes across page refreshes.
+- Use a remotely hosted Aiven MySQL database with SSL enabled.
+
+## 🛠️ Technology Stack
 
 ### Frontend
 - React.js
+- Vite
 - Tailwind CSS
 - JavaScript
-- Vite
+- Fetch/API integration
 
 ### Backend
 - Node.js
 - Express.js
 - REST API
+- CORS
+- dotenv
 
 ### Database
 - MySQL
+- Aiven Cloud MySQL
+- mysql2
+- SSL/TLS database connection
 
-## Project Structure
+### Deployment and Tools
+- Vercel — frontend and backend deployment
+- Git and GitHub — version control
+- Visual Studio Code — development environment
+
+## 🏗️ Project Structure
 
 ```text
-HireFlow-ATS/
+Mini-Applicant-Tracking-System-ATS/
 ├── client/
 │   ├── public/
 │   ├── src/
-│   │   ├── api.js
+│   │   ├── components/
+│   │   ├── pages/
 │   │   ├── App.jsx
-│   │   ├── main.jsx
-│   │   └── ...
+│   │   └── main.jsx
+│   ├── vercel.json
 │   ├── package.json
-│   └── ...
+│   └── index.html
+│
 ├── server/
 │   ├── src/
+│   │   ├── config/
+│   │   │   └── db.js
 │   │   ├── routes/
-│   │   └── ...
-│   ├── package.json
-│   └── ...
+│   │   │   ├── candidates.js
+│   │   │   ├── jobs.js
+│   │   │   └── applications.js
+│   │   └── server.js
+│   ├── certs/
+│   │   └── ca.pem
+│   ├── index.js
+│   └── package.json
+│
 ├── .gitignore
 └── README.md
 ```
 
-The exact internal structure may vary depending on the implementation.
+*Note: The structure above represents the main project files. Your local folder may contain additional files.*
 
-## Prerequisites
+## ⚙️ Getting Started
 
-Install the following before running the project:
+Follow these steps to run the project locally.
+
+### Prerequisites
+
+Install the following:
 
 - Node.js and npm
-- MySQL Server
+- MySQL database or an accessible MySQL instance
 - Git
-
-## Installation and Setup
 
 ### 1. Clone the repository
 
 ```bash
-git clone <YOUR_GITHUB_REPOSITORY_URL>
-cd <YOUR_PROJECT_FOLDER>
+git clone https://github.com/Shreyavk28/Mini-Applicant-Tracking-System-ATS-.git
+cd Mini-Applicant-Tracking-System-ATS-
 ```
 
-Replace the placeholders with your actual repository URL and project folder.
-
-### 2. Set up the backend
+### 2. Configure the backend
 
 ```bash
 cd server
 npm install
 ```
 
-Configure the environment variables required by your backend.
+Create a `.env` file inside the `server/` directory.
 
-If your project provides an example environment file, copy it and update the values:
-
-```bash
-# Windows PowerShell
-Copy-Item .env.example .env
-```
-
-Example environment configuration:
+Add the following variables using your own database credentials:
 
 ```env
 PORT=5000
-DB_HOST=localhost
-DB_PORT=3306
+
+DB_HOST=your_mysql_host
+DB_PORT=your_mysql_port
 DB_USER=your_mysql_username
 DB_PASSWORD=your_mysql_password
-DB_NAME=hireflow_ats
+DB_NAME=defaultdb
+DB_SSL=true
+
+CLIENT_URL=http://localhost:5173
 ```
 
-These are example variable names. Use the exact names expected by your backend code.
-
-Create the required MySQL database and tables according to your project's schema or SQL setup scripts.
+**Important:**
+- Replace the database placeholders with your own MySQL connection details.
+- Use `DB_SSL=true` when connecting to a database that requires SSL.
+- Ensure the required CA certificate is available at `server/certs/ca.pem` when SSL is enabled.
+- Never commit your `.env` file or database credentials to GitHub.
 
 Start the backend:
 
@@ -134,107 +162,122 @@ Start the backend:
 npm run dev
 ```
 
-If the project does not define a development script, check `server/package.json` for the available start command.
+The API should be available at:
 
-### 3. Set up the frontend
+```text
+http://localhost:5000
+```
 
-Open another terminal from the project root:
+Health check:
+
+```text
+http://localhost:5000/api/health
+```
+
+### 3. Configure the frontend
+
+Open a second terminal from the project root:
 
 ```bash
 cd client
 npm install
+```
+
+Create a `.env` file inside `client/` if required by your local frontend configuration.
+
+For local development, configure the frontend API base URL to point to the backend:
+
+```env
+VITE_API_URL=http://localhost:5000/api
+```
+
+If the frontend already uses a different API configuration, keep it consistent with the existing application code.
+
+Start the frontend:
+
+```bash
 npm run dev
 ```
 
-Open the local URL printed by Vite in the terminal.
+Open the local URL printed by Vite, usually:
 
-### 4. Verify the application
+```text
+http://localhost:5173
+```
 
-- Confirm the backend starts without database connection errors.
-- Confirm the frontend can communicate with the backend.
-- Add and manage candidates.
-- Create and update applications.
-- Test hiring-stage tracking.
-- Test search and dashboard metrics.
-- Verify job management and data persistence.
+## 🔗 API Endpoints
 
-## Environment Variables
+The deployed backend base URL is:
 
-Do not commit actual secrets to GitHub.
+```text
+https://hireflow-ats-api-fresh.vercel.app
+```
 
-Typical backend configuration may include:
+| Method | Endpoint | Purpose |
+|---|---|---|
+| GET | `/api/health` | Check API and database health |
+| GET | `/api/candidates` | Retrieve candidates |
+| POST | `/api/candidates` | Create a candidate |
+| GET | `/api/jobs` | Retrieve jobs |
+| POST | `/api/jobs` | Create a job |
+| GET | `/api/applications` | Retrieve applications |
+| POST | `/api/applications` | Create an application |
+| GET | `/api/dashboard` | Retrieve dashboard metrics |
+| PUT | `/api/applications/:id/stage` | Update an application's stage |
 
-| Variable | Purpose |
-|---|---|
-| `PORT` | Backend server port |
-| `DB_HOST` | MySQL host |
-| `DB_PORT` | MySQL port |
-| `DB_USER` | MySQL username |
-| `DB_PASSWORD` | MySQL password |
-| `DB_NAME` | Database name |
+Additional supported routes may be available for updating or deleting candidates, jobs, and applications.
 
-The variable names above are examples. Check your server configuration to confirm the actual names used by the project.
+## 🗄️ Database
 
-## API
+The application uses MySQL to store recruitment data, including:
 
-The backend exposes REST API endpoints for the application's resources.
+- `candidates`
+- `jobs`
+- `applications`
 
-Typical operations include:
+The backend connects to the configured MySQL database through a connection pool. In production, the database is hosted on Aiven and accessed over an SSL-enabled connection.
 
-- Retrieve candidate records.
-- Create, update, and delete candidates.
-- Retrieve and manage applications.
-- Track application stages.
-- Retrieve, create, update, and delete jobs.
-- Check application or server health, if configured.
+## 🌐 Deployment
 
-Refer to the backend route files for the exact endpoint paths, HTTP methods, request bodies, and response formats.
+The application is deployed using Vercel.
 
-## Security Notes
+- **Frontend:** React application deployed on Vercel.
+- **Backend:** Express API deployed on Vercel.
+- **Database:** Aiven Cloud MySQL.
+- **API routing:** Frontend rewrite configuration forwards `/api/*` requests to the deployed backend.
 
-- Store database credentials in environment variables.
+Production environment variables are configured in the Vercel project settings rather than committed to the repository.
+
+## 🔒 Security
+
+- Store sensitive credentials in environment variables.
 - Keep `.env` files out of version control.
-- Validate incoming API requests.
-- Handle errors without exposing secrets.
-- Use appropriate database permissions.
-- Configure CORS for the intended frontend origin when deploying.
+- Use SSL/TLS for the production database connection.
+- Restrict CORS to trusted frontend origins.
+- Never publish database passwords or private credentials in documentation.
 
-## Future Improvements
+## 🧪 Testing
 
-Possible enhancements include:
+The following workflows have been tested in the deployed application:
 
-- Advanced candidate filtering.
-- Resume upload and management.
-- Interview scheduling.
-- Recruitment activity reports.
-- Role-based recruiter access.
-- Email notifications.
-- Automated deployment and testing.
+- Backend health check and database connectivity.
+- Candidate creation and management.
+- Job creation and management.
+- Application-stage updates.
+- Dashboard metrics.
+- Data persistence after refreshing the website.
 
-These are potential future improvements and may not be implemented in the current version.
+## 🎯 Project Objective
 
-## Assignment Deliverables
+HireFlow ATS demonstrates full-stack application development by combining a responsive React frontend, RESTful APIs built with Express, and persistent MySQL storage. It provides a practical foundation for managing recruitment workflows in one application.
 
-For the EarlyJobs.ai assignment, prepare:
-
-1. The deployed application URL.
-2. The GitHub repository URL.
-3. A short demonstration video showing the core features.
-
-Add the actual links here when they are ready:
-
-- **Live Demo:** Add your deployed application URL
-- **GitHub Repository:** Add your repository URL
-- **Demo Video:** Add your video URL
-
-## Author
+## 👩‍💻 Author
 
 **Shreya V K**
 
-GitHub: [Shreyavk28](https://github.com/Shreyavk28)
+- GitHub: https://github.com/Shreyavk28
+- Project: [HireFlow ATS](https://mini-applicant-tracking-system-ats.vercel.app)
 
-LinkedIn: [Shreya V K](https://linkedin.com/in/shreya-vk-softwareengineer)
+---
 
-## License
-
-This project was created for learning and assignment purposes. Add a license file if you intend to distribute the project under a specific open-source license.
+Built with React, Node.js, Express, and MySQL.
