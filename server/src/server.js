@@ -113,6 +113,11 @@ app.use((err, req, res, next) => {
 });
 
 // Start only after verifying the database connection
+
+/**
+ * Start the server locally.
+ * On Vercel, export the Express app for serverless handling.
+ */
 async function startServer() {
   try {
     await testConnection();
@@ -128,4 +133,10 @@ async function startServer() {
   }
 }
 
-startServer();
+if (process.env.VERCEL) {
+  module.exports = app;
+} else {
+  startServer();
+  module.exports = app;
+}
+    
