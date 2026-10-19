@@ -1,0 +1,9 @@
+
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://mini-applicant-tracking-system-ats-nu.vercel.app/api/:path*"
+    }
+  ]
+}
