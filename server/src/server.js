@@ -12,21 +12,34 @@ const applicationsRouter = require("./routes/applications");
 const app = express();
 const PORT = Number(process.env.PORT || 5000);
 
-// Allowed frontend origins
+// Normalize origins to avoid mismatches caused by trailing slashes.
+const normalizeOrigin = (origin) => origin?.trim().replace(/\/+$/, "");
 
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
   "http://127.0.0.1:5173",
   "http://127.0.0.1:5174",
+
+  // Production frontend
   "https://mini-applicant-tracking-system-ats.vercel.app",
-  process.env.CLIENT_URL?.trim().replace(/\/$/, ""),
+
+  // Optional frontend URL configured in Vercel environment variables
+  normalizeOrigin(process.env.CLIENT_URL),
 ].filter(Boolean);
 
+// CORS configuration
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin.replace(/\/$/, ""))) {
+      // Allow requests without an Origin header.
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      const normalizedOrigin = normalizeOrigin(origin);
+
+      if (allowedOrigins.includes(normalizedOrigin)) {
         return callback(null, true);
       }
 
@@ -38,7 +51,6 @@ app.use(
   })
 );
 
-
 app.use(express.json({ limit: "1mb" }));
 
 // Health check
@@ -46,7 +58,7 @@ app.get("/api/health", async (req, res) => {
   try {
     await pool.query("SELECT 1");
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "HireFlow ATS API is running",
       database: "connected",
@@ -54,14 +66,14 @@ app.get("/api/health", async (req, res) => {
   } catch (error) {
     console.error("Health check database error:", error.message);
 
-    res.status(503).json({
+    return res.status(503).json({
       success: false,
       message: "Database connection unavailable",
     });
   }
 });
 
-// API routes
+// Candidate, job, and application routes
 app.use("/api/candidates", candidatesRouter);
 app.use("/api/jobs", jobsRouter);
 app.use("/api/applications", applicationsRouter);
@@ -87,7 +99,7 @@ app.get("/api/dashboard", async (req, res, next) => {
       "SELECT COUNT(*) AS total FROM jobs"
     );
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       data: {
         totalCandidates: candidateResult.total,
@@ -101,7 +113,7 @@ app.get("/api/dashboard", async (req, res, next) => {
   }
 });
 
-// Unknown API routes
+// Unknown routes
 app.use((req, res) => {
   res.status(404).json({
     success: false,
@@ -113,7 +125,6 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
   console.error("API error:", err.message);
 
-  // Handle CORS errors explicitly
   if (err.message === "Origin not allowed by CORS") {
     return res.status(403).json({
       success: false,
@@ -121,16 +132,14 @@ app.use((err, req, res, next) => {
     });
   }
 
-  res.status(500).json({
+  return res.status(500).json({
     success: false,
     message: "Internal server error",
   });
 });
 
-/**
- * Start the server locally.
- * On Vercel, export the Express app for serverless handling.
- */
+// Start the server locally.
+// Vercel handles the exported Express app as a serverless function.
 async function startServer() {
   try {
     await testConnection();
