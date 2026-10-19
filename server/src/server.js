@@ -12,11 +12,13 @@ const applicationsRouter = require("./routes/applications");
 const app = express();
 const PORT = Number(process.env.PORT || 5000);
 
+// Allowed frontend origins
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
   "http://127.0.0.1:5173",
   "http://127.0.0.1:5174",
+  "https://mini-applicant-tracking-system-ats.vercel.app",
   process.env.CLIENT_URL,
 ].filter(Boolean);
 
@@ -24,13 +26,19 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests without an Origin header.
-      if (!origin || allowedOrigins.includes(origin)) {
+      // Allow requests without an Origin header,
+      // such as server-to-server requests and health checks.
+      if (!origin) {
         return callback(null, true);
       }
 
-      console.error("Blocked CORS origin:", origin);
-      return callback(null, false);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      console.error("CORS rejected origin:", origin);
+
+      return callback(new Error("Origin not allowed by CORS"));
     },
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -44,7 +52,7 @@ app.get("/api/health", async (req, res) => {
   try {
     await pool.query("SELECT 1");
 
-    res.json({
+    res.status(200).json({
       success: true,
       message: "HireFlow ATS API is running",
       database: "connected",
@@ -85,7 +93,7 @@ app.get("/api/dashboard", async (req, res, next) => {
       "SELECT COUNT(*) AS total FROM jobs"
     );
 
-    res.json({
+    res.status(200).json({
       success: true,
       data: {
         totalCandidates: candidateResult.total,
@@ -99,7 +107,7 @@ app.get("/api/dashboard", async (req, res, next) => {
   }
 });
 
-// Unknown routes
+// Unknown API routes
 app.use((req, res) => {
   res.status(404).json({
     success: false,
@@ -109,7 +117,15 @@ app.use((req, res) => {
 
 // Central error handler
 app.use((err, req, res, next) => {
-  console.error(err);
+  console.error("API error:", err.message);
+
+  // Handle CORS errors explicitly
+  if (err.message === "Origin not allowed by CORS") {
+    return res.status(403).json({
+      success: false,
+      message: "Origin not allowed by CORS",
+    });
+  }
 
   res.status(500).json({
     success: false,
@@ -139,6 +155,6 @@ async function startServer() {
 if (process.env.VERCEL) {
   module.exports = app;
 } else {
-  startServer();
   module.exports = app;
+  startServer();
 }
