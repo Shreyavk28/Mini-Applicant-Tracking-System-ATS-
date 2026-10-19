@@ -20,20 +20,23 @@ const allowedOrigins = [
   process.env.CLIENT_URL,
 ].filter(Boolean);
 
+// CORS configuration
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests without an Origin header, such as health checks.
+      // Allow requests without an Origin header.
       if (!origin || allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
 
-      return callback(new Error("Origin not allowed by CORS"));
+      console.error("Blocked CORS origin:", origin);
+      return callback(null, false);
     },
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
 app.use(express.json({ limit: "1mb" }));
 
 // Health check
@@ -47,6 +50,8 @@ app.get("/api/health", async (req, res) => {
       database: "connected",
     });
   } catch (error) {
+    console.error("Health check database error:", error.message);
+
     res.status(503).json({
       success: false,
       message: "Database connection unavailable",
@@ -112,8 +117,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start only after verifying the database connection
-
 /**
  * Start the server locally.
  * On Vercel, export the Express app for serverless handling.
@@ -139,4 +142,3 @@ if (process.env.VERCEL) {
   startServer();
   module.exports = app;
 }
-    
