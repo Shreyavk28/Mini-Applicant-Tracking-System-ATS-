@@ -3,7 +3,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://mini-applicant-tracking-system-ats-nu.vercel.app/api/:path*"
+      "destination": "https://mini-applicant-tracking-system-ats-w3f7-9zvpwx4mf.vercel.app/api/:path*"
     }
   ]
 }
