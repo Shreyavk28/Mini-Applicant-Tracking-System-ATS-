@@ -22,8 +22,8 @@ const allowedOrigins = [
   "http://127.0.0.1:5173",
   "http://127.0.0.1:5174",
   "https://mini-applicant-tracking-system-ats.vercel.app",
-  "https://mini-applicant-tracking-system-ats-w3f7-9zvpwx4mf.vercel.app",
-  process.env.CLIENT_URL?.trim().replace(/\/+$/, ""),
+  "https://mini-applicant-tracking-system-ats-nu.vercel.app",
+  process.env.CLIENT_URL?.trim().replace(/\/$/, ""),
 ].filter(Boolean);
 
 app.use(
@@ -31,13 +31,13 @@ app.use(
     origin: (origin, callback) => {
       if (
         !origin ||
-        allowedOrigins.includes(origin.trim().replace(/\/+$/, ""))
+        allowedOrigins.includes(origin.trim().replace(/\/$/, ""))
       ) {
         return callback(null, true);
       }
 
       console.error("CORS rejected origin:", origin);
-      return callback(new Error("Origin not allowed by CORS"));
+      return callback(null, false);
     },
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
