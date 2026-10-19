@@ -15,31 +15,24 @@ const PORT = Number(process.env.PORT || 5000);
 // Normalize origins to avoid mismatches caused by trailing slashes.
 const normalizeOrigin = (origin) => origin?.trim().replace(/\/+$/, "");
 
+
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
   "http://127.0.0.1:5173",
   "http://127.0.0.1:5174",
-
-  // Production frontend
   "https://mini-applicant-tracking-system-ats.vercel.app",
-
-  // Optional frontend URL configured in Vercel environment variables
-  normalizeOrigin(process.env.CLIENT_URL),
+  "https://mini-applicant-tracking-system-ats-w3f7-9zvpwx4mf.vercel.app",
+  process.env.CLIENT_URL?.trim().replace(/\/+$/, ""),
 ].filter(Boolean);
 
-// CORS configuration
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests without an Origin header.
-      if (!origin) {
-        return callback(null, true);
-      }
-
-      const normalizedOrigin = normalizeOrigin(origin);
-
-      if (allowedOrigins.includes(normalizedOrigin)) {
+      if (
+        !origin ||
+        allowedOrigins.includes(origin.trim().replace(/\/+$/, ""))
+      ) {
         return callback(null, true);
       }
 
@@ -50,6 +43,7 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
 
 app.use(express.json({ limit: "1mb" }));
 
